@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Patient Records
+{% endblock %}
+
+{% block main %}
+    <body class="flex text-gray-900 bg-gradient-to-l from-blue-500 to-blue-700 h-64 w-full">
+        <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+            <div class="flex items-center space-x-2 mb-6">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+            </div>
+            <nav class="flex-1 space-y-2">
+                <a style="font-family: Zain, sans-serif;" href="/doctordashboard" class="text-2xl flex items-center p-2 rounded-xl hover:bg-indigo-400 transition">Dashboard</a>
+
+                <a style="font-family: Zain, sans-serif;" href="/doctorappointments" class="text-2xl flex items-center p-2 rounded-xl hover:bg-indigo-400 transition">Appointments</a>
+                
+                <a style="font-family: Zain, sans-serif;" href="/records" class="text-2xl flex items-center p-2 rounded-xl bg-blue-900 text-white">Records</a>
+                
+                <a style="font-family: Zain, sans-serif;" href="/doctorprofile" class="text-2xl flex items-center p-2 rounded-lg hover:bg-indigo-400 transition">Profile</a>
+
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/doctorrequests" class="text-2xl flex items-center p-2 rounded-lg hover:bg-indigo-400 transition">Requests</a>
+            </nav>
+            <a style="font-family: Zain, sans-serif;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+        </aside>
+        
+        <div class="flex-1 p-6 min-h-screen">
+            <h2 class="text-white text-5xl mb-6 font-semibold" style="font-family: Zain, sans-serif;">Patient Records</h2>
+            <div class="mb-6 flex flex-col md:flex-row md:items-center gap-4">
+                <div style="position:relative; width:100%;">
+                    <input type="text" id="searchInput" autocomplete="off" placeholder="Search by name..." class="px-4 py-2 w-full md:w-1/3 text-white text-xl rounded-lg shadow-md border border-blue-900 bg-blue-900 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400" style="font-family: Zain, sans-serif;"/>
+                    <ul id="suggestionList" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-20 mt-1 text-left hidden max-h-40 max-w-65 overflow-y-auto"></ul>
+                </div>
+                <button id="openAddPatientBtn" class="px-4 py-2 w-full md:w-1/4 rounded-lg text-white text-xl shadow-md border border-blue-900 bg-blue-900 hover:bg-blue-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-400" style="font-family: Zain, sans-serif;">Add Patient</button>
+                <form method="POST" class="inline-block">
+                    <button type="submit" name="action" value="sort" class="px-8 py-2 w-full md:w-32 rounded-lg text-white text-center text-xl shadow-md border border-blue-900 bg-blue-900 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400" style="font-family: Zain, sans-serif;">
+                        Sort
+                    </button>
+                </form>
+            </div>
+
+            <div id="addPatientPopup" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeAddPatientPopup()"></div>
+                <div class="relative min-w-[350px] max-w-xl w-full text-center rounded-md bg-white p-8 text-black border border-blue-900 shadow-xl flex flex-col items-center" style="font-family: Zain, sans-serif;">
+                    <span class="absolute top-2 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closeAddPatientPopup()">&times;</span>
+                    <h2 class="mb-4 text-2xl font-semibold text-blue-900">Add New Patient</h2>
+                    <form id="addPatientForm" method="post" class="space-y-4 w-full">
+                        <input name="name" type="text" placeholder="Full Name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        <input name="dob" type="date" placeholder="Date of Birth" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        <input name="email" type="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        <input name="phone" type="text" placeholder="Phone Number" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input name="address" type="text" placeholder="Address" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input name="med_num" type="text" placeholder="Medical (NHS) Number" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <div class="flex justify-center space-x-3 pt-2">
+                            <button type="button" onclick="closeAddPatientPopup()" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                            <button type="submit" name="action" value="add" class="px-4 py-2 text-white bg-blue-900 rounded-lg hover:bg-blue-700 transition">Add Patient</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h" id="patientGrid">
+                {% for patient in patients %}
+                <div class="rounded-md p-6 text-black border border-white/20 hover:border-gray-900 border-1 transition-all shadow-lg patient-card"
+                    data-name="{{ patient.name|lower }}" data-condition="">
+                    <h3 class="text-3xl font-semibold mb-2" style="font-family: Zain, sans-serif;">{{ patient.name|title }}</h3>
+                    
+                    <button onclick="openPopup('{{ patient.id }}')" style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;" class="mt-4 cursor-pointer px-6 py-2 rounded-lg font-medium text-white font-semibold bg-blue-900 hover:bg-blue-700 backdrop-blur-sm transition-all duration-300" name="action" value="add">View Record</button>
+                    
+                    <div id="addPopup-{{ patient.id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+                        <div class="relative min-w-[300px] max-w-md text-center rounded-md bg-white p-6 text-black border border-white transition-colors duration-300 hover:border-gray-800 flex flex-col justify-center items-center shadow-lg">
+                            <span class="absolute top-2 right-4 text-2xl cursor-pointer" onclick="closePopup('{{ patient.id }}')">&times;</span>
+                            <h2 style="font-family: Zain, sans-serif;" class="text-2xl mb-4">{{ patient.name|title }}</h2>
+                            <form method="post" class="space-y-3">
+                                <p style="font-family: Zain, sans-serif;"><strong>Date of Birth:</strong> {{ patient.dob }}</p>
+                                <p style="font-family: Zain, sans-serif;"><strong>Email:</strong> {{ patient.email }}</p>
+                                <p style="font-family: Zain, sans-serif;"><strong>Address:</strong> {{ patient.address }}</p>
+                                <p style="font-family: Zain, sans-serif;"><strong>Phone:</strong> {{ patient.phone }}</p>
+
+                                <div class="w-full mt-6">
+                                    <h3 class="text-xl font-semibold mb-3" style="font-family: Zain, sans-serif;">Conditions</h3>
+                                    <div class="relative w-full overflow-hidden">
+                                        <div id="conditionSlider-{{ patient.id }}" class="flex transition-transform duration-300">
+                                            {% if patient_conditions.get(patient.id) %}
+                                                {% for condition in patient_conditions[patient.id] %}
+                                                <div class="min-w-full p-4 rounded-lg bg-gray-100 text-black shadow-md mx-1 relative condition-slide" style="font-family: Zain, sans-serif;">
+                                                    <p>{{ condition }}</p>
+                                                    <form method="post" class="condition-delete-form" style="display: none;" onsubmit="return confirm('Are you sure you want to remove this condition?');">
+                                                        <input type="hidden" name="patient_id" value="{{ patient.id }}">
+                                                        <input type="hidden" name="condition_name" value="{{ condition }}">
+                                                        <button type="submit" name="action" value="delete_condition" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-600 hover:text-red-800 text-2xl font-bold">
+                                                            ✕
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="min-w-full p-4 rounded-lg bg-gray-100 text-black shadow-md mx-1 text-center" style="font-family: Zain, sans-serif;">
+                                                    <p>No Current Conditions</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% if patient_conditions.get(patient.id) and patient_conditions[patient.id]|length > 1 %}
+                                        <button type="button" onclick="slidePrev({{ patient.id }})" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white p-2 rounded-full hover:bg-blue-700">‹</button>
+                                        <button type="button" onclick="slideNext({{ patient.id }})" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white p-2 rounded-full hover:bg-blue-700">›</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <script>
+            const patients = [
+                {% for patient in patients %}
+                    "{{ patient.name|escape }}",
+                {% endfor %}
+            ];
+        
+            const searchInput = document.getElementById('searchInput');
+            const suggestionList = document.getElementById('suggestionList');
+            const cards = document.querySelectorAll('.patient-card');
+        
+            function filterCards(query) {
+                query = query.toLowerCase();
+                cards.forEach(card => {
+                    const name = card.getAttribute('data-name');
+                    card.style.display = name.includes(query) ? 'block' : 'none';
+                });
+            }
+        
+            function showSuggestions() {
+                const value = searchInput.value.trim().toLowerCase();
+                suggestionList.innerHTML = "";
+                suggestionList.classList.add("hidden");
+                if (value.length === 0) return;
+                const matched = patients.filter(p => p.toLowerCase().includes(value));
+                if (matched.length === 0) return;
+                matched.forEach(name => {
+                    const li = document.createElement("li");
+                    li.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer";
+                    li.textContent = name;
+                    li.onclick = function () {
+                        searchInput.value = name;
+                        filterCards(name);
+                        suggestionList.classList.add("hidden");
+                    };
+                    suggestionList.appendChild(li);
+                });
+                suggestionList.classList.remove("hidden");
+            }
+        
+            searchInput.addEventListener('input', function () {
+                showSuggestions();
+                filterCards(searchInput.value);
+            });
+        
+            document.addEventListener("click", function (e) {
+                if (!searchInput.contains(e.target) && !suggestionList.contains(e.target)) {
+                    suggestionList.classList.add("hidden");
+                }
+            });
+        
+            function setupConditionHover(popupId) {
+                const popup = document.getElementById('addPopup-' + popupId);
+                const conditionSlides = popup.querySelectorAll('.condition-slide');
+                
+                conditionSlides.forEach(slide => {
+                    const deleteForm = slide.querySelector('.condition-delete-form');
+                    
+                    if (deleteForm) {
+                        slide.addEventListener('mouseenter', function() {
+                            deleteForm.style.display = 'block';
+                        });
+                        
+                        slide.addEventListener('mouseleave', function() {
+                            deleteForm.style.display = 'none';
+                        });
+                    }
+                });
+            }
+        
+            function openPopup(id) { 
+                document.getElementById("addPopup-" + id).classList.remove("hidden"); 
+                document.body.classList.add('overflow-hidden');
+                setupConditionHover(id);
+            }
+            
+            function closePopup(id) { 
+                document.getElementById("addPopup-" + id).classList.add("hidden"); 
+                document.body.classList.remove('overflow-hidden'); 
+            }
+            
+            const sliders = {};
+            function slideNext(patientId) {
+                const slider = document.getElementById(`conditionSlider-${patientId}`);
+                const slides = slider.children.length;
+                sliders[patientId] = (sliders[patientId] || 0) + 1;
+                if (sliders[patientId] >= slides) sliders[patientId] = 0;
+                slider.style.transform = `translateX(-${sliders[patientId] * 100}%)`;
+            }
+            function slidePrev(patientId) {
+                const slider = document.getElementById(`conditionSlider-${patientId}`);
+                const slides = slider.children.length;
+                sliders[patientId] = (sliders[patientId] || 0) - 1;
+                if (sliders[patientId] < 0) sliders[patientId] = slides - 1;
+                slider.style.transform = `translateX(-${sliders[patientId] * 100}%)`;
+            }
+        
+            const addPatientPopup = document.getElementById('addPatientPopup');
+            const openAddPatientBtn = document.getElementById('openAddPatientBtn');
+        
+            openAddPatientBtn.onclick = function() {
+                addPatientPopup.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            };
+            function closeAddPatientPopup() {
+                addPatientPopup.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+            window.closeAddPatientPopup = closeAddPatientPopup;
+        </script>
+    </body>
+{% endblock %}

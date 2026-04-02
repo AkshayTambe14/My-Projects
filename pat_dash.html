@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    <body class="flex min-h-screen text-gray-900 bg-gradient-to-l from-green-800 to-green-950 h-64 w-full">
+        
+        <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+            <div class="flex items-center space-x-2 mb-6">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+            </div>
+        
+            <nav class="flex-1 space-y-2">
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientdashboard" class="text-2xl flex items-center p-2 rounded-xl bg-green-900 text-white">Dashboard</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientappointments" class="text-2xl flex items-center p-2 rounded-lg hover:bg-green-300 transition">Appointments</a>
+            
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/history" class="text-2xl flex items-center p-2 rounded-xl hover:bg-green-300 transition">History</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientprofile" class="text-2xl flex items-center p-2 rounded-lg hover:bg-green-300 transition">Profile</a>
+            </nav>
+        
+            <a style="font-family: Zain, sans-serif;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+        </aside>
+
+        <div class="flex-1 m-6">
+            <h2 class="text-white text-5xl mb-6 font-semibold" style="font-family: Zain, sans-serif;">
+                Welcome, {{ pname }}
+            </h2>
+
+            <div class="grid grid-cols-2 lg:grid-cols-1 gap-6">
+                <div class="rounded-md bg-white/10 backdrop-blur-lg p-6 text-white border border-green-900 hover:border-green-950 transition-all duration-200 shadow-lg">             
+                    <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-4xl">Upcoming Appointments</h1>
+                    <div class="overflow-x-auto flex mt-4 space-x-4 items-stretch pb-2">
+                        {% for appt in appointments %}
+                            <a href="{{ url_for('patient_appointments') }}" class="min-w-[225px] bg-white/20 backdrop-blur-lg rounded-lg shadow-md border border-green-900 flex flex-col h-45 hover:scale-95 transition-transform duration-150">
+                                <div class="bg-gradient-to-r from-green-900 to-green-800 text-white font-bold p-2 rounded-t-lg text-center shadow-sm">
+                                    {{ appt.date.strftime("%Y-%m-%d") }}
+                                </div>
+                                
+                                <div class="flex-1 p-3 flex flex-col justify-between bg-white/30 backdrop-blur-lg rounded-b-lg border border-green-200 shadow-inner">
+                                    {% set start_dt = datetime.combine(appt.date, appt.time) %}
+                                    {% set end_dt = start_dt + timedelta(minutes=appt.duration_mins) %}
+                                    <div>
+                                        <p class="font-semibold text-green-900 text-lg">{{ start_dt.strftime("%H:%M") }} – {{ end_dt.strftime("%H:%M") }}</p>
+                                        <p class="italic text-green-700 mt-1">Dr. {{ appt.doctor_name }}</p>
+                                    </div>
+                                
+                                    <div class="h-[1px] bg-gradient-to-r from-green-200 to-transparent my-2"></div>
+                                
+                                    <div class="text-sm space-y-1">
+                                        <p class="text-gray-700"><span class="font-medium">Duration:</span> {{ appt.duration_mins }} mins</p>
+                                    </div>
+                                </div>
+                            </a>
+                        {% else %}
+                            <p class="text-gray-400">No upcoming appointments scheduled.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+{% endblock %}

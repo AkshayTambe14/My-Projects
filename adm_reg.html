@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+<body style="background-image: url(https://images.pexels.com/photos/17485658/pexels-photo-17485658.png);" class="min-h-screen flex items-center justify-center bg-cover bg-center">
+    <div class="max-w-lg">
+        <div class="rounded-md bg-white/10 backdrop-blur-lg p-6 text-white border border-white/20 hover:border-gray-900 transition-all duration-400 flex flex-col items-center space-y-4 max-w-md shadow-lg">
+            <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-4xl text-gray-900 text-center mb-4 flex items-center justify-center gap-2">
+                Administrator Register
+                <span class="w-3 h-3 bg-purple-500 rounded-full inline-block"></span>
+            </h1>      
+            <form class="flex flex-col items-center gap-4" method="POST">
+                <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-gray-500" name="name" placeholder="Full Name" type="text" style="font-family: Zain, sans-serif;">
+                <input class="h-8 w-64 rounded-md bg-white font-semibold text-gray-500 text-center" name="dob" placeholder="Date of Birth" type="text" onfocus="(this.type='date')" onblur="if(this.value==''){this.type='text'}" style="font-family: Zain, sans-serif; text-align: center; color:#6B7280;">
+                <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-gray-500" name="phone" placeholder="Phone Number" type="text" style="font-family: Zain, sans-serif;">
+                <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-gray-500" name="email" placeholder="Email" type="email" style="font-family: Zain, sans-serif;">
+                <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-gray-500" name="password" placeholder="Password" type="password" style="font-family: Zain, sans-serif;">
+                <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-gray-500" name="confirmation" placeholder="Confirm Password" type="password" style="font-family: Zain, sans-serif;">
+                <button class="rounded-md bg-gray-900 px-4 py-2 text-white cursor-pointer fzont-semibold hover:bg-gray-600 transition-all duration-300 mt-2" type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+</body>
+{% endblock %}

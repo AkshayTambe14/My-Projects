@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Doctor Appointments
+{% endblock %}
+
+{% block main %}
+    <body class="flex text-gray-900 bg-gradient-to-l from-blue-500 to-blue-700 min-h-screen w-full">
+
+        <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+            <div class="flex items-center space-x-2 mb-6">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+                <circle cx="12" cy="12" r="12" />
+                <path d="M12 6v6l4 2" />
+                </svg>
+            </div>
+    
+            <nav class="flex-1 space-y-2">
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/doctordashboard" class="text-2xl flex items-center p-2 rounded-xl hover:bg-indigo-400 transition">Dashboard</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/doctorappointments" class="text-2xl flex items-center p-2 rounded-xl bg-blue-900 text-white">Appointments</a>
+            
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/records" class="text-2xl flex items-center p-2 rounded-xl hover:bg-indigo-400 transition">Records</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/doctorprofile" class="text-2xl flex items-center p-2 rounded-lg hover:bg-indigo-400 transition">Profile</a>
+
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/doctorrequests" class="text-2xl flex items-center p-2 rounded-lg hover:bg-indigo-400 transition">Requests</a>
+            </nav>
+    
+            <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+        </aside>
+
+        <div class="flex-1 p-8">  
+            <div class="max-w-6xl mx-auto">
+
+                <div class="mb-6 ">
+                    <h1 class="text-white text-5xl mb-6 font-semibold" style="font-family: Zain, sans-serif;">Doctor Appointments</h1>
+                </div>
+
+                <div class="mb-5 rounded-md bg-white/10 backdrop-blur-lg p-6 text-white border border-white/20">
+                    <div class="flex items-center justify-between p-6">
+                        <a href="{{ url_for('doctor_appointments_navigate', year=year, month=month, direction='prev') }}" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </a>
+                        
+                        <h2 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-2xl font-bold text-black">
+                            {{ month_name }} {{ year }}
+                        </h2>
+                        
+                        <a href="{{ url_for('doctor_appointments_navigate', year=year, month=month, direction='next') }}" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+        
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="grid grid-cols-7 bg-gray-100">
+                        {% for day in day_names %}
+                        <div style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;" class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">
+                            {{ day }}
+                        </div>
+                        {% endfor %}
+                    </div>
+        
+                    <div class="grid grid-cols-7">
+                        {% for week in calendar_weeks %}
+                            {% for day in week %}
+                            <div class="h-32 border-r border-b border-gray-200 last:border-r-0 p-2 relative
+                                {% if day.is_other_month %}bg-gray-50 text-gray-400{% endif %}
+                                {% if day.is_today %}bg-blue-50{% endif %}
+                                hover:bg-gray-50 transition-colors cursor-pointer">
+                                
+                                <div class="flex justify-between items-start h-full">
+                                    <span style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;" class="text-sm font-medium
+                                        {% if day.is_today %}text-blue-600 bg-blue-100 px-2 py-1 rounded-full{% endif %}
+                                        {% if day.is_other_month %}text-gray-400{% else %}text-gray-800{% endif %}">
+                                        {{ day.day }}
+                                    </span>
+                                </div>
+        
+                                {% if day.events %}
+                                <div class="absolute bottom-1 left-1 right-1">
+                                    {% for event in day.events[:3] %}
+                                    <div style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mb-1 truncate">
+                                        <p>{{ event.name|title }}    ({{ event.time.strftime('%H:%M') }} - {{ event.end_time.strftime('%H:%M') }})</p>
+                                    </div>
+                                    {% endfor %}
+                                    {% if day.events|length > 3 %}
+                                    <div style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" class="text-xs text-gray-500">
+                                        +{{ day.events|length - 3 }} more
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+        
+                <div class="mt-6 flex justify-between items-center">
+                    <a href="{{ url_for('doctor_appointments_today') }}" style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;"class="mb-3 bg-gray-100 hover:bg-gray-300 text-black px-6 py-2 rounded-lg font-medium transition-colors inline-block">Today</a>
+                    
+                    <button onclick="openaddPopup()" style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;" class="mb-3 cursor-pointer bg-white hover:bg-gray-300 text-black px-6 py-2 rounded-lg font-medium transition-colors" name="action" value="add">Add Appointment</button>
+                    <button onclick="openeditPopup()" style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;" class="mb-3 cursor-pointer bg-white hover:bg-gray-300 text-black px-6 py-2 rounded-lg font-medium transition-colors" name="action" value="edit">Edit Appointments</button>
+                    <button onclick="openopPopup()" style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;" class="mb-3 cursor-pointer bg-white hover:bg-gray-300 text-black px-6 py-2 rounded-lg font-medium transition-colors" name="action" value="optimise">Optimise</button>
+                </div>
+
+                <div id="addPopup" class="hidden fixed inset-0 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-black/20"></div>
+                
+                    <div class="relative min-w-[300px] text-center rounded-md bg-white p-6 text-black border border-white transition-colors duration-300 hover:border-gray-800">
+                        <span class="absolute top-2 right-4 text-2xl cursor-pointer" onclick="closeaddPopup()">&times;</span>
+                        
+                        <h2>Add Appointment</h2>
+                        <form method="post">
+                            <div style="position:relative;">
+                                <label for="patient" class="block text-sm font-medium mb-1">Patient</label>
+                                <input type="text" id="patientInput" name="patient" placeholder="Search patient..." autocomplete="off"
+                                    class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" oninput="showSuggestions()">
+                                <ul id="suggestionList"
+                                    class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-20 mt-1 text-left hidden max-h-40 overflow-y-auto">
+                                </ul>
+                            </div>
+
+                            <div>
+                                <label for="date" class="block text-sm font-medium mb-1">Date</label>
+                                <input type="date" id="appdate" name="appdate" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            
+                            <div>
+                                <label for="time" class="block text-sm font-medium mb-1">Time</label>
+                                <input type="time" id="time" name="time" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+
+                            <div>
+                                <label for="duration" class="block text-sm font-medium mb-1">Duration (Minutes)</label>
+                                <input type="text" id="duration" name="duration" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            
+                            <div>
+                                <label for="description" class="block text-sm font-medium mb-1">Description</label>
+                                <textarea id="description" name="description" rows="3" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                            </div>
+                            
+                            <div class="flex justify-center space-x-3 pt-4">
+                                <button type="submit" class="px-4 py-2 text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition"> Save Appointment</button>
+                            </div> 
+                            <input type="hidden" name="action" value="add">
+                        </form>
+                    </div>
+                </div>
+
+                <div id="editPopup" class="hidden fixed inset-0 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-black/20"></div>
+                
+                    <div class="relative min-w-[320px] max-w-md text-center rounded-md bg-white p-6 text-black border border-white transition-colors duration-300 hover:border-gray-800">
+                        <span class="absolute top-2 right-4 text-2xl cursor-pointer" onclick="closeeditPopup()">&times;</span>
+                        
+                        <h2 style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;">Edit Appointment</h2>
+
+                        <form method="post">
+                            <div style="position:relative;">
+                                <label for="editPatientInput" class="block text-sm font-medium mb-1">Patient</label>
+                                <input type="text" id="editPatientInput" name="patient" placeholder="Search patient..." autocomplete="off"
+                                    class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" oninput="showEditSuggestions()">
+                                <ul id="editSuggestionList" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-20 mt-1 text-left hidden max-h-40 overflow-y-auto"></ul>
+                            </div>
+
+                            <div>
+                                <label for="og_date" class="block text-sm font-medium mb-1">Original Date</label>
+                                <input type="date" id="og_date" name="ogdate" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+
+                            <div>
+                                <label for="new_date" class="block text-sm font-medium mb-1">Updated Date</label>
+                                <input type="date" id="new_date" name="newdate" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+
+                            <div>
+                                <label for="og_time" class="block text-sm font-medium mb-1">Original Time</label>
+                                <input type="time" id="og_time" name="ogtime" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            
+                            <div>
+                                <label for="new_time" class="block text-sm font-medium mb-1">Updated Time</label>
+                                <input type="time" id="new_time" name="newtime" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+
+                            <div>
+                                <label for="duration_edit" class="block text-sm font-medium mb-1">Updated Duration (Minutes)</label>
+                                <input type="text" id="duration_edit" name="duration" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            
+                            <div>
+                                <label for="description_edit" class="block text-sm font-medium mb-1">New Description</label>
+                                <textarea id="description_edit" name="description" rows="3" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                            </div>
+                            
+                            <div class="flex justify-center space-x-3 pt-4">
+                                <button type="submit" name="action" value="edit" class="px-4 py-2 text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition">Update Appointment</button>
+                            </div> 
+                            <input type="hidden" name="action" value="edit">
+                        </form>
+                    </div>
+                </div>
+
+                <div id="opPopup" class="hidden fixed inset-0 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-black/20"></div>
+                
+                    <div class="relative min-w-[300px] text-center rounded-md bg-white p-6 text-black border border-white transition-colors duration-300 hover:border-gray-800">
+                        <span class="absolute top-2 right-4 text-2xl cursor-pointer" onclick="closeopPopup()">&times;</span>
+                        
+                        <h2 style="font-family: Zain, sans-serif; font-weight: 500; font-style: normal;">Optimise Day's Schedule</h2>
+
+                        <form method="post">
+                            <div>
+                                <label for="date" class="block text-sm font-medium mb-1">Date To Optimise</label>
+                                <input type="date" id="date" name="date" required class="w-full rounded-md border border-black/30 bg-white/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            
+                            <div class="flex justify-center space-x-3 pt-4">
+                                <button type="submit" name="action" value="optimise" class="px-4 py-2 text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition">Optimise Day</button>
+                            </div> 
+                            <input type="hidden" name="action" value="optimise">
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    
+    </body>
+
+    <script>
+        function openaddPopup() {document.getElementById("addPopup").style.display = "flex";}
+        function closeaddPopup() {document.getElementById("addPopup").style.display = "none";}
+
+        function openeditPopup() {document.getElementById("editPopup").style.display = "flex";}
+        function closeeditPopup() {document.getElementById("editPopup").style.display = "none";}
+
+        function openopPopup() {document.getElementById("opPopup").style.display = "flex";}
+        function closeopPopup() {document.getElementById("opPopup").style.display = "none";}
+
+
+        const patients = [
+            {% for patient in patients_list %}
+                "{{ patient|escape }}",
+            {% endfor %}
+        ];
+        
+        function showSuggestions() {
+            const input = document.getElementById("patientInput");
+            const list = document.getElementById("suggestionList");
+            const value = input.value.toLowerCase();
+            list.innerHTML = "";
+            list.classList.add("hidden");
+            if (value.length === 0) return;
+            const matched = patients.filter(p => p.toLowerCase().includes(value));
+            if (matched.length === 0) return;
+            matched.forEach(name => {
+                const li = document.createElement("li");
+                li.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer";
+                li.textContent = name;
+                li.onclick = function() {
+                    input.value = name;
+                    list.classList.add("hidden");
+                };
+                list.appendChild(li);
+            });
+            list.classList.remove("hidden");
+        }
+        document.addEventListener("click", function(e) {
+            const patientInput = document.getElementById("patientInput");
+            const suggestionList = document.getElementById("suggestionList");
+            if (patientInput && !patientInput.contains(e.target)) {
+                suggestionList.classList.add("hidden");
+            }
+        });
+    
+        const editpatients = [
+            {% for patient in patients_list %}
+                "{{ patient|escape }}",
+            {% endfor %}
+        ];
+
+        function showEditSuggestions() {
+            const input = document.getElementById("editPatientInput");
+            const list = document.getElementById("editSuggestionList");
+            const value = input.value.toLowerCase();
+            list.innerHTML = "";
+            list.classList.add("hidden");
+            if (value.length === 0) return;
+            const matched = editpatients.filter(p => p.toLowerCase().includes(value));
+            if (matched.length === 0) return;
+            matched.forEach(name => {
+                const li = document.createElement("li");
+                li.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer";
+                li.textContent = name;
+                li.onclick = function() {
+                    input.value = name;
+                    list.classList.add("hidden");
+                };
+                list.appendChild(li);
+            });
+            list.classList.remove("hidden");
+        }
+        document.addEventListener("click", function(e) {
+            const editPatientInput = document.getElementById("editPatientInput");
+            const editSuggestionList = document.getElementById("editSuggestionList");
+            if (editPatientInput && !editPatientInput.contains(e.target)) {
+                editSuggestionList.classList.add("hidden");
+            }
+        });
+    </script>
+{% endblock %}

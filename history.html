@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <body class="flex min-h-screen text-gray-900 bg-gradient-to-l from-green-800 to-green-950 w-full">
+
+        <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+            <div class="flex items-center space-x-2 mb-6">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+            </div>
+            <nav class="flex-1 space-y-2">
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientdashboard" class="text-2xl flex items-center p-2 rounded-xl hover:bg-green-300 transition">Dashboard</a>
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientappointments" class="text-2xl flex items-center p-2 rounded-xl hover:bg-green-300 transition">Appointments</a>
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/history" class="text-2xl flex items-center p-2 rounded-xl bg-green-900 text-white">History</a>
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientprofile" class="text-2xl flex items-center p-2 rounded-lg hover:bg-green-300 transition">Profile</a>
+            </nav>
+            <a style="font-family: Zain, sans-serif;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+        </aside>
+
+        <div class="flex-1 p-6 min-h-screen">
+            <h2 class="text-white text-5xl mb-8 font-semibold" style="font-family: Zain, sans-serif;">
+                Appointment History
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% if done_apps %}
+
+                    {% for appt in done_apps %}
+                    <div class="bg-white/20 backdrop-blur-lg rounded-xl shadow-xl hover:scale-105 transition-all duration-300 p-6 relative flex flex-col justify-between">
+                        <div class="absolute -top-6 left-4 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
+                            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <div class="mt-6">
+                            <h3 class="text-3xl font-bold text-black mb-2" style="font-family: Zain, sans-serif;">
+                                Completed
+                            </h3>
+                            <p class="text-lg text-white mb-1"><span class="font-semibold text-black">Date:</span> {{ appt.date.strftime("%Y-%m-%d") }}</p>
+                            <p class="text-md text-white mb-1"><span class="font-semibold text-black">Time:</span> {{ appt.time.strftime("%H:%M") }}</p>
+                            <p class="text-md text-white mb-1"><span class="font-semibold text-black">Duration:</span> {{ appt.duration_mins }} mins</p>
+                            <p class="text-md text-white mb-1"><span class="font-semibold text-black">Doctor:</span> {{ appt.name }}</p>
+                            <p class="text-md text-white mb-2"><span class="font-semibold text-black">Reason:</span> {{ appt.reason }}</p>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <span class="bg-green-700 text-white px-4 py-1 rounded-full text-xs font-semibold" style="font-family: Zain, sans-serif;"">Completed</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                {% else %}
+                    <div class="col-span-3 text-center text-gray-100 text-xl mt-10" style="font-family: Zain, sans-serif;">No completed appointments found.</div>
+                {% endif %}
+
+                {% if sched_apps %}
+                
+                    {% for appt in sched_apps %}
+                    <div class="bg-white/20 backdrop-blur-lg rounded-xl shadow-xl border border-green-900 hover:scale-105 transition-all duration-300 p-6 relative flex flex-col justify-between">
+                        <div class="absolute -top-6 left-4 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
+                            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7v6a4 4 0 01-8 0V7"></path>
+                            </svg>
+                        </div>
+                        <div class="mt-6">
+                            <h3 class="text-3xl font-bold text-black mb-2" style="font-family: Zain, sans-serif;">
+                                Upcoming
+                            </h3>
+                            <p class="text-lg text-white mb-1"><span class="font-semibold text-black">Date:</span> {{ appt.date.strftime("%Y-%m-%d") }}</p>
+                            <p class="text-md text-white mb-1"><span class="font-semibold text-black">Time:</span> {{ appt.time.strftime("%H:%M") }}</p>
+                            <p class="text-md text-white mb-1"><span class="font-semibold text-black">Duration:</span> {{ appt.duration_mins }} mins</p>
+                            <p class="text-md text-white mb-1"><span class="font-semibold text-black">Doctor:</span> {{ appt.name }}</p>
+                            <p class="text-md text-white mb-2"><span class="font-semibold text-black">Reason:</span> {{ appt.reason }}</p>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <span class="bg-green-700 text-white px-4 py-1 rounded-full text-xs font-semibold">Upcoming</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                {% endif %}
+            </div>
+        </div>
+    </body>
+{% endblock %}

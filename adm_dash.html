@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+
+    <body class="flex min-h-screen text-gray-900 bg-gradient-to-l from-purple-500 to-purple-700">
+
+        <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+            <div class="flex items-center space-x-2 mb-6">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+                <circle cx="12" cy="12" r="12" />
+                <path d="M12 6v6l4 2" />
+                </svg>
+            </div>
+        
+            <nav class="flex-1 space-y-2">
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/admindashboard" class="text-2xl flex items-center p-2 rounded-xl bg-purple-900 text-white">Dashboard</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/doctors" class="text-2xl flex items-center p-2 rounded-xl hover:bg-purple-300 transition">Doctors</a>
+            
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patients" class="text-2xl flex items-center p-2 rounded-xl hover:bg-purple-300 transition">Patients</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/adminprofile" class="text-2xl flex items-center p-2 rounded-xl hover:bg-purple-300 transition">Profile</a>
+            </nav>
+        
+            <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+        </aside>
+
+        <div class="flex-1 p-8">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-4 border border-white/20 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div style="font-family: Zain, sans-serif; font-weight: 600;" class="text-3xl text-white">Doctors</div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                                    {% for doc in doctors %}
+                                    <div class="flex gap-4 items-center bg-white rounded-xl shadow-sm border border-gray-200 p-4 transition hover:shadow-md">
+                                        <div class="flex-shrink-0 w-20 h-20 bg-purple-900 rounded-lg flex items-center justify-center text-white text-xl font-bold">
+                                            <span class="text-sm m-6 leading-tight" style="font-family: Zain, sans-serif;">{{ doc.name|title }}</span>
+                                        </div>
+                
+                                        <div class="flex-1 min-w-0">
+                                            <div style="font-family: Zain, sans-serif;" class="text-lg font-semibold text-gray-900 truncate">{{ doc.specialty|title }}</div>
+                                            <div class="mt-1 text-sm text-gray-600 space-y-0.5">
+                                                <div class="truncate" style="font-family: Zain, sans-serif;">Phone: {{ doc.phone }}</div>
+                                                <div class="truncate" style="font-family: Zain, sans-serif;">Email: {{ doc.email }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 shadow-sm">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div style="font-family: Zain, sans-serif; font-weight: 600;" class="text-2xl text-white">Book Appointment</div>
+                        </div>
+                    </div>
+
+                    <form action="/admindashboard" method="POST" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div class="md:col-span-1">
+                            <label for="patient" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Patient</label>
+                        
+                            <div style="position:relative; width:100%;">
+                                <input type="text" id="searchInput" name="patient" autocomplete="off" placeholder="Search by name..." class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none" style="font-family: Zain, sans-serif;"/>
+                                <ul id="suggestionList" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-20 mt-1 text-left hidden max-h-40 max-w-65 overflow-y-auto"></ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="doctor" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Doctor</label>
+                            <select id="doctor" name="doctor_id" class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                {% for doc in doctors %}
+                                <option value="{{ doc.id }}">{{ doc.name|title }} — {{ doc.specialty|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="date" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Date</label>
+                            <input type="date" id="date" name="date" class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none" style="font-family: Zain, sans-serif;">
+                        </div>
+
+                        <div>
+                            <label for="time" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Time</label>
+                            <input type="time" id="time" name="time" class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none" style="font-family: Zain, sans-serif;">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="reason" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Reason</label>
+                            <textarea id="reason" name="reason" rows="3" placeholder="Reason for appointment" class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none" style="font-family: Zain, sans-serif;"></textarea>
+                        </div>
+
+                        <div>
+                            <label for="duration" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Duration (Minutes)</label>
+                            <input type="number" id="duration" name="duration" min="1" class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none" style="font-family: Zain, sans-serif;">
+                        </div>
+
+                        <div>
+                            <label for="priority" class="block text-sm font-medium text-gray-200" style="font-family: Zain, sans-serif;">Priority</label>
+                            <select id="priority" name="priority" class="mt-1 block w-full p-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none" style="font-family: Zain, sans-serif;">
+                                <option value="urgent">Urgent</option>
+                                <option value="high">High</option>
+                                <option value="neutral" selected>Neutral</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-white text-black rounded-md shadow hover:bg-gray-100 transition">Book Appointment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        const patientList = [
+                {% for patient in patients %}
+                    "{{ patient.name|escape }}",
+                {% endfor %}
+            ];
+
+        const searchInput = document.getElementById('searchInput');
+        const suggestionList = document.getElementById('suggestionList');
+        const cards = document.querySelectorAll('.patient-card');
+
+        function filterCards(query) {
+            query = query.toLowerCase();
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                card.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        function showSuggestions() {
+            const value = searchInput.value.trim().toLowerCase();
+            suggestionList.innerHTML = "";
+            suggestionList.classList.add("hidden");
+            if (value.length === 0) return;
+            const matched = patientList.filter(p => p.toLowerCase().includes(value));
+            if (matched.length === 0) return;
+            matched.forEach(name => {
+                const li = document.createElement("li");
+                li.className = "px-4 py-2 hover:bg-purple-100 cursor-pointer";
+                li.textContent = name;
+                li.onclick = function () {
+                    searchInput.value = name;
+                    filterCards(name);
+                    suggestionList.classList.add("hidden");
+                };
+                suggestionList.appendChild(li);
+            });
+            suggestionList.classList.remove("hidden");
+        }
+
+        searchInput.addEventListener('input', function () {
+            showSuggestions();
+            filterCards(searchInput.value);
+        });
+
+        document.addEventListener("click", function (e) {
+            if (!searchInput.contains(e.target) && !suggestionList.contains(e.target)) {
+                suggestionList.classList.add("hidden");
+            }
+        });
+    </script>
+
+{% endblock %}

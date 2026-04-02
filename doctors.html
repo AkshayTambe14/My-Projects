@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Doctor Records
+{% endblock %}
+
+{% block main %}
+<body class="flex text-gray-900 bg-gradient-to-l from-purple-500 to-purple-700 h-64 w-full">
+
+    <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+        <div class="flex items-center space-x-2 mb-6">
+            <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a style="font-family: Zain, sans-serif;" href="/admindashboard" class="text-2xl flex items-center p-2 rounded-xl hover:bg-violet-400 transition">Dashboard</a>
+            <a style="font-family: Zain, sans-serif;" href="/doctors" class="text-2xl flex items-center p-2 rounded-xl bg-purple-900 text-white">Doctors</a>
+            <a style="font-family: Zain, sans-serif;" href="/patients" class="text-2xl flex items-center p-2 rounded-xl hover:bg-violet-400 transition">Patients</a>
+            <a style="font-family: Zain, sans-serif;" href="/adminprofile" class="text-2xl flex items-center p-2 rounded-xl hover:bg-violet-400 transition">Profile</a>
+        </nav>
+        <a style="font-family: Zain, sans-serif;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+    </aside>
+
+    <div class="flex-1 p-6 min-h-screen">
+        <h2 class="text-white text-5xl mb-6 font-semibold" style="font-family: Zain, sans-serif;">Doctor Records</h2>
+        <div class="mb-6 flex flex-col md:flex-row md:items-center gap-4">
+                <div style="position:relative; width:100%;">
+                    <input type="text" id="searchInput" autocomplete="off" placeholder="Search by name..." class="px-4 py-2 w-full md:w-1/3 text-white text-xl rounded-lg shadow-md border border-purple-900 bg-purple-900 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400" style="font-family: Zain, sans-serif;"/>
+                    <ul id="suggestionList" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-20 mt-1 text-left hidden max-h-40 max-w-65 overflow-y-auto"></ul>
+                </div>
+                <button id="openAddDoctorBtn" class="px-4 py-2 w-full md:w-1/4 rounded-lg text-white text-xl shadow-md border border-purple-900 bg-purple-900 hover:bg-purple-700 text-left focus:outline-none focus:ring-2 focus:ring-purple-400" style="font-family: Zain, sans-serif;">Add Doctor</button>
+                <form method="POST" class="inline-block">
+                    <button type="submit" name="action" value="sort" class="px-8 py-2 w-full md:w-32 rounded-lg text-white text-center text-xl shadow-md border border-purple-900 bg-purple-900 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400" style="font-family: Zain, sans-serif;">Sort</button>
+                </form>
+        </div>
+
+        <div id="addDoctorPopup" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeAddDoctorPopup()"></div>
+            <div class="relative min-w-[350px] max-w-xl w-full text-center rounded-md bg-white p-8 text-black border border-purple-900 shadow-xl flex flex-col items-center" style="font-family: Zain, sans-serif;">
+                <span class="absolute top-2 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closeDoctorPopup()">&times;</span>
+                <h2 class="mb-4 text-2xl font-semibold text-purple-900">Add New Doctor</h2>
+                <form id="addDoctorForm" method="post" class="space-y-4 w-full">
+                    <input name="name" type="text" placeholder="Full Name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    <input name="dob" type="date" placeholder="Date of Birth" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    <input name="email" type="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                    <input name="phone" type="text" placeholder="Phone Number" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <input name="specialty" type="text" placeholder="Specialty" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <div class="flex justify-center space-x-3 pt-2">
+                        <button type="button" onclick="closeAddDoctorPopup()" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                        <button type="submit" name="action" value="add" class="px-4 py-2 text-white bg-purple-900 rounded-lg hover:bg-purple-700 transition">Add Doctor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h" id="doctorGrid">
+            {% for doctor in doctors %}
+            <div class="rounded-md p-6 text-black border border-white/20 hover:border-gray-900 border-1 transition-all shadow-lg doctor-card"
+                 data-name="{{ doctor.name|lower }}" data-specialty="{{ doctor.specialty|lower }}">
+                <h3 class="text-3xl font-semibold mb-2" style="font-family: Zain, sans-serif;">{{ doctor.name|title }}</h3>
+                
+                <button onclick="openPopup('{{ doctor.id }}')" style="font-family: Zain, sans-serif;" class="mt-4 cursor-pointer px-6 py-2 rounded-lg font-medium text-white font-semibold bg-purple-900 hover:bg-purple-700 backdrop-blur-sm transition-all duration-300">View Record</button>
+                <div id="addPopup-{{ doctor.id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+                    <div class="relative min-w-[350px] max-w-xl text-center rounded-md bg-white p-6 text-black border border-purple-400 shadow-xl flex flex-col items-center" style="font-family: Zain, sans-serif;">
+                        <span class="absolute top-2 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closePopup('{{ doctor.id }}')">&times;</span>
+                        <h2 class="mb-4 text-2xl font-semibold text-purple-900">{{ doctor.name|title }}</h2>
+                        <form method="post" class="space-y-3 w-full">
+                            <p><strong>Email:</strong> {{ doctor.email }}</p>
+                            <p><strong>Phone:</strong> {{ doctor.phone }}</p>
+                            <p><strong>Specialty:</strong> {{ doctor.specialty }}</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        const doctorlist = [
+                {% for doctor in doctors %}
+                    "{{ doctor.name|escape }}",
+                {% endfor %}
+            ];
+
+        const searchInput = document.getElementById('searchInput');
+        const suggestionList = document.getElementById('suggestionList');
+        const cards = document.querySelectorAll('.doctor-card');
+
+        function filterCards(query) {
+            query = query.toLowerCase();
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                card.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        function showSuggestions() {
+            const value = searchInput.value.trim().toLowerCase();
+            suggestionList.innerHTML = "";
+            suggestionList.classList.add("hidden");
+            if (value.length === 0) return;
+            const matched = doctorlist.filter(p => p.toLowerCase().includes(value));
+            if (matched.length === 0) return;
+            matched.forEach(name => {
+                const li = document.createElement("li");
+                li.className = "px-4 py-2 hover:bg-purple-100 cursor-pointer";
+                li.textContent = name;
+                li.onclick = function () {
+                    searchInput.value = name;
+                    filterCards(name);
+                    suggestionList.classList.add("hidden");
+                };
+                suggestionList.appendChild(li);
+            });
+            suggestionList.classList.remove("hidden");
+        }
+
+        searchInput.addEventListener('input', function () {
+            showSuggestions();
+            filterCards(searchInput.value);
+        });
+
+        document.addEventListener("click", function (e) {
+            if (!searchInput.contains(e.target) && !suggestionList.contains(e.target)) {
+                suggestionList.classList.add("hidden");
+            }
+        });
+
+        const addDoctorPopup = document.getElementById('addDoctorPopup');
+        const openAddDoctorBtn = document.getElementById('openAddDoctorBtn');
+
+        openAddDoctorBtn.onclick = function() {
+            addDoctorPopup.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        };
+        function closeAddDoctorPopup() {
+            addDoctorPopup.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+        window.closeAddDoctorPopup = closeAddDoctorPopup; 
+
+        function openPopup(id) { document.getElementById("addPopup-" + id).classList.remove("hidden"); document.body.classList.add('overflow-hidden'); }
+        function closePopup(id) { document.getElementById("addPopup-" + id).classList.add("hidden"); document.body.classList.remove('overflow-hidden'); }
+    </script>
+</body>
+{% endblock %}

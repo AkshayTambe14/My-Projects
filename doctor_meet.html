@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment Meeting{% endblock %}
+
+{% block main %}
+    <body class="min-h-screen bg-gradient-to-l from-blue-500 to-blue-700 flex" style="font-family: 'Zain', sans-serif;">
+        
+        <div class="flex-1 p-8">
+            <div class="max-w-3xl mx-auto">
+                <div class="rounded-md bg-white/10 backdrop-blur-lg p-6 border border-white/20 shadow-lg mb-6" style="font-family: 'Zain', sans-serif;">
+                    <h2 class="text-3xl font-bold text-blue-900 mb-4">Appointment Details</h2>
+                    <div class="flex gap-8 items-center">
+
+                        <div class="bg-white/20 backdrop-blur-lg rounded-lg shadow-lg p-6 min-w-[220px] border border-blue-200" style="font-family: 'Zain', sans-serif;">
+                            <h3 class="text-2xl font-semibold text-blue-900 mb-2">{{ appointment.patient_name }}</h3>
+                            <p class="text-sm text-blue-700 mb-1"><strong>Email:</strong> {{ appointment.email }}</p>
+                            <p class="text-sm text-blue-700 mb-1"><strong>DOB:</strong> {{ appointment.dob }}</p>
+                            <p class="text-sm text-blue-700 mb-1"><strong>Phone:</strong> {{ appointment.phone }}</p>
+                            <p class="text-sm text-blue-700 mb-1"><strong>Medical Record Number:</strong> {{ appointment.medical_record_number }}</p>
+                            <p class="text-sm text-blue-700 mb-1"><strong>Address:</strong> {{ appointment.address }}</p>
+                        </div>
+
+                        <div style="font-family: 'Zain', sans-serif;">
+                            <p><strong>Date:</strong> {{ appointment.date.strftime('%Y-%m-%d') }}</p>
+                            <p><strong>Time:</strong> {{ appointment.time.strftime('%H:%M') }}</p>
+                            <p><strong>Duration:</strong> {{ appointment.duration_mins }} mins</p>
+                            <p><strong>Status:</strong> {{ appointment.status }}</p>
+                            <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" class="rounded-md bg-white/10 backdrop-blur-lg p-6 border border-white/20 shadow-lg mb-6" style="font-family: 'Zain', sans-serif;">
+                    <h3 class="text-2xl font-semibold text-blue-900 mb-3">Doctor Notes</h3>
+                    <textarea name="notes" rows="4" class="w-full p-2 rounded-lg border border-blue-200 mb-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" style="font-family: 'Zain', sans-serif;">{{ appointment.notes or '' }}</textarea>
+                    <button type="submit" name="action" value="add_note" class="px-6 py-2 rounded-lg font-semibold shadow bg-blue-50 text-blue-900 border border-blue-200 hover:bg-blue-100 hover:border-blue-400 transition-all duration-200" style="font-family: 'Zain', sans-serif;">Save Notes</button>
+                </form>
+                {% if last_notes %}
+                <div class="rounded-md bg-white/10 backdrop-blur-lg p-6 border border-white/20 shadow-lg mb-6" style="font-family: 'Zain', sans-serif;">
+                    <h3 class="text-2xl font-semibold text-blue-900 mb-3">Previous Appointment Notes</h3>
+                    <p class="text-blue-800 mb-2 text-sm">
+                        <strong>Date:</strong> {{ last_notes.date.strftime('%Y-%m-%d') }},
+                        <strong>Time:</strong> {{ last_notes.time.strftime('%H:%M') }}
+                    </p>
+                    <pre class="whitespace-pre-wrap bg-blue-50 border border-blue-200 p-3 rounded-md text-blue-900 text-sm">{{ last_notes.notes }}</pre>
+                </div>
+                {% endif %}
+
+                <form method="POST" class="rounded-md bg-white/10 backdrop-blur-lg p-6 border border-white/20 shadow-lg mb-6" style="font-family: 'Zain', sans-serif;">
+                    <h3 class="text-2xl font-semibold text-blue-900 mb-3">Patient Conditions</h3>
+                    <div class="flex gap-2 mb-4">
+                        <input id="condition-input" type="text" placeholder="Enter condition..." class="flex-grow rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                        <button type="button" id="add-condition-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Add</button>
+                    </div>
+                    <div id="conditions-list" class="flex flex-wrap gap-2 mb-4"></div>
+                    <input type="hidden" name="conditions" id="conditions-hidden">
+                    <button type="submit" name="action" value="add_conditions" class="px-6 py-2 rounded-lg font-semibold shadow bg-blue-50 text-blue-900 border border-blue-200 hover:bg-blue-100 hover:border-blue-400 transition-all duration-200" style="font-family: 'Zain', sans-serif;">Save Conditions</button>
+                </form>
+                
+
+                <form method="POST" enctype="multipart/form-data" class="rounded-md bg-white/10 backdrop-blur-lg p-6 border border-white/20 shadow-lg mb-6" style="font-family: 'Zain', sans-serif;">
+                    <h3 class="text-2xl font-semibold text-blue-900 mb-3">Attach and Transcribe Audio Notes</h3>
+                    <label class="block mb-3">
+                        <span class="block font-semibold text-blue-900 mb-1" style="font-family: 'Zain', sans-serif;">Attach Audio (.wav)</span>
+                        <input type="file" name="audio_file" accept=".wav,audio/wav" required class="block w-full text-blue-900 bg-white/80 rounded-lg border border-blue-200 shadow-md px-3 py-2 transition ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-900 hover:file:bg-blue-100" style="font-family: 'Zain', sans-serif;"></label>
+                    <button type="submit" name="action" value="transcribe_audio" class="px-6 py-2 rounded-lg font-semibold shadow bg-purple-50 text-purple-900 border border-purple-200 hover:bg-purple-100 hover:border-purple-400 transition-all duration-200" style="font-family: 'Zain', sans-serif;"> Transcribe & Attach</button>
+                </form>
+
+                <div class="flex gap-4" style="font-family: 'Zain', sans-serif;">
+                    <form method="POST">
+                        <button type="submit" name="action" value="cancel"
+                            class="px-6 py-2 rounded-lg font-semibold shadow bg-red-50 text-red-900 border border-red-200 hover:bg-red-100 hover:border-red-400 transition-all duration-200">
+                            Cancel Appointment
+                        </button>
+                    </form>
+                    <form method="POST">
+                        <button type="submit" name="action" value="complete"
+                            class="px-6 py-2 rounded-lg font-semibold shadow bg-green-50 text-green-900 border border-green-200 hover:bg-green-100 hover:border-green-400 transition-all duration-200">
+                            Mark as Completed
+                        </button>
+                    </form>
+                    <button onclick="document.getElementById('postponePopup').classList.remove('hidden');" type="button"
+                        class="px-6 py-2 rounded-lg font-semibold shadow bg-yellow-50 text-yellow-900 border border-yellow-200 hover:bg-yellow-100 hover:border-yellow-400 transition-all duration-200">
+                        Postpone
+                    </button>
+                </div>
+
+                <div id="postponePopup" class="hidden fixed inset-0 flex items-center justify-center z-50" style="font-family: 'Zain', sans-serif;">
+                    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('postponePopup').classList.add('hidden');"></div>
+                    <form method="POST" class="relative bg-white rounded-lg p-7 shadow-lg z-10 w-96 border border-blue-200">
+                        <span class="absolute top-2 right-4 text-2xl cursor-pointer" onclick="document.getElementById('postponePopup').classList.add('hidden');">&times;</span>
+                        <h3 class="text-2xl font-semibold text-blue-900 mb-2">Postpone Appointment</h3>
+                        <label for="new_date" class="block mb-2">New Date</label>
+                        <input type="date" name="new_date" id="new_date" required class="w-full p-2 rounded border border-blue-200 mb-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" style="font-family: 'Zain', sans-serif;">
+                        <label for="new_time" class="block mb-2">New Time</label>
+                        <input type="time" name="new_time" id="new_time" required class="w-full p-2 rounded border border-blue-200 mb-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" style="font-family: 'Zain', sans-serif;">
+                        <button type="submit" name="action" value="postpone"
+                            class="px-4 py-2 rounded-lg font-semibold shadow bg-yellow-50 text-yellow-900 border border-yellow-200 hover:bg-yellow-100 hover:border-yellow-400 transition-all duration-200">
+                            Postpone
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const conditionInput = document.getElementById('condition-input');
+            const addConditionBtn = document.getElementById('add-condition-btn');
+            const conditionsList = document.getElementById('conditions-list');
+            const conditionsHidden = document.getElementById('conditions-hidden');
+            let conditions = [];
+        
+            function updateConditionsList() {
+                conditionsList.innerHTML = '';
+                conditions.forEach((condition, index) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2';
+                    tag.innerHTML = `
+                        <span>${condition}</span>
+                        <button type="button" onclick="removeCondition(${index})" class="text-blue-600 hover:text-blue-800 font-bold">&times;</button>
+                    `;
+                    conditionsList.appendChild(tag);
+                });
+                conditionsHidden.value = conditions.join(', ');
+            }
+        
+            window.removeCondition = function(index) {
+                conditions.splice(index, 1);
+                updateConditionsList();
+            };
+        
+            addConditionBtn.addEventListener('click', function() {
+                const condition = conditionInput.value.trim();
+                if (condition && !conditions.includes(condition)) {
+                    conditions.push(condition);
+                    updateConditionsList();
+                    conditionInput.value = '';
+                }
+            });
+        
+            conditionInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addConditionBtn.click();
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

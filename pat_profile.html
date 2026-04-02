@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Patient Profile
+{% endblock %}
+
+{% block main %}
+
+    <body class="flex min-h-screen text-gray-900 bg-gradient-to-l from-green-800 to-green-950 h-64 w-full">
+        
+        <aside class="m-2 mt-2 rounded-md bg-white shadow-lg border-r border-gray-200 flex flex-col min-h-screen p-4">
+            <div class="flex items-center space-x-2 mb-6">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-5xl font-semibold text-blue-600">ChronoCare</h1>
+            </div>
+        
+            <nav class="flex-1 space-y-2">
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientdashboard" class="text-2xl flex items-center p-2 rounded-xl hover:bg-green-300 transition">Dashboard</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientappointments" class="text-2xl flex items-center p-2 rounded-xl hover:bg-green-300 transition">Appointments</a>
+            
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/history" class="text-2xl flex items-center p-2 rounded-xl hover:bg-green-300 transition">History</a>
+        
+                <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/patientprofile" class="text-2xl flex items-center p-2 rounded-xl bg-green-900 text-white">Profile</a>
+            </nav>
+        
+            <a style="font-family: Zain, sans-serif; font-weight: 400; font-style: normal;" href="/logout" class="text-lg mt-6 mx-auto text-red-600 font-semibold hover:underline">Logout</a>
+        </aside>
+
+        <div class="min-w-half flex items-center h-auto flex-wrap mx-auto my-32 lg:my-0">
+            <div id="profile" class="min-w-half rounded-md bg-white/10 backdrop-blur-lg p-6 text-black border border-green-900 shadow-lg">
+                <div class="p-4 md:p-12 text-center lg:text-left">
+
+                    <h1 class="text-5xl text-white font-bold pt-8 lg:pt-0" style="font-family: Zain, sans-serif; font-weight: 800; font-style: normal;">{{ patient.name|title }}</h1>
+
+                    <p class="text-white pt-4 text-base flex items-center justify-center lg:justify-start">
+                        <svg class="h-4 fill-current text-green-700 pr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2zm0 2v.01L12 13 20 6.01V6H4z"/>
+                          </svg>                          
+                        {{ patient.email }}
+                    </p>
+
+                    <p class="text-white pt-4 text-base flex items-center justify-center lg:justify-start">
+                        <svg class="h-4 fill-current text-green-700 pr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M6 0h2v2h4V0h2v2h2a2 2 0 0 1 2 2v2H2V4a2 2 0 0 1 2-2h2V0zm12 8v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8h16z"/>
+                          </svg>                          
+                        {{ patient.dob }}
+                    </p>
+
+                    <p class="text-white pt-4 text-base flex items-center justify-center lg:justify-start">
+                        <svg class="h-4 fill-current text-green-700 pr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M2 2a2 2 0 0 1 2-2h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 2 2z"/>
+                          </svg>                          
+                        {{ patient.phone }}
+                    </p>
+
+                    <p class="text-white pt-4 text-base flex items-center justify-center lg:justify-start">
+                        <svg class="h-4 fill-current text-green-700 pr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M10 2C6.13 2 3 5.13 3 9c0 5.25 7 9 7 9s7-3.75 7-9c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 10 6a2.5 2.5 0 0 1 0 5z"/>
+                          </svg>                       
+                        {{ patient.address }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+
+{% endblock %}

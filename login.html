@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block main %}
+    <body style="background-image: url(https://images.pexels.com/photos/17485658/pexels-photo-17485658.png);" class="min-h-screen flex items-center justify-center bg-cover bg-center">
+        <div class="max-w-lg">
+            <div class="rounded-md bg-white/10 backdrop-blur-lg p-6 text-white border border-white/20 hover:border-gray-900 border-2 transition-all duration-400 flex flex-col items-center space-y-4 max-w-md shadow-lg">
+                <h1 style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="text-4xl text-gray-900 text-center mb-4">Log In</h1>
+                <form class="flex flex-col items-center gap-4" method="POST" action="/">
+                    <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-black" style="font-family: Zain, sans-serif;" autocomplete="off" name="email" placeholder="Email" type="text">
+                    <input class="h-8 w-64 rounded-md text-center bg-white font-semibold text-black" style="font-family: Zain, sans-serif;" name="password" placeholder="Password" type="password">
+                    <button style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="rounded-md bg-gray-900 px-5 py-2 text-xl text-white cursor-pointer font-semibold hover:bg-gray-600 transition-all duration-300" name="action" value="login">Submit</button>
+                    <div class="flex justify-center space-x-4 mt-6">
+                        <button style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="rounded-2xl bg-blue-200 px-4 py-2 text-black cursor-pointer font-semibold text-base shadow hover:bg-blue-300 transition-all duration-300" name="action" value="doctor_register">Doctor Register</button>
+                        <button style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="rounded-2xl bg-green-200 px-4 py-2 text-black cursor-pointer font-semibold text-base shadow hover:bg-green-300 transition-all duration-300" name="action" value="patient_register">Patient Register</button>
+                        <button style="font-family: Zain, sans-serif; font-weight: 600; font-style: normal;" class="rounded-2xl bg-purple-200 px-4 py-2 text-black cursor-pointer font-semibold text-base shadow hover:bg-purple-300 transition-all duration-300" name="action" value="admin_register">Admin Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
+{% endblock %}
